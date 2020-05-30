@@ -5,16 +5,25 @@ import android.os.Bundle;
 import android.util.Log;
 import android.util.Patterns;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.iid.FirebaseInstanceId;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 
 import static com.example.connectfour.Util.savePushToken;
 
@@ -34,6 +43,13 @@ public class SignupActivity extends AppCompatActivity {
    // DatabaseReference reference1;
     User user1;
     Score score;
+
+    /* 29 may code update starts*/
+    private DocumentReference mDocRef;
+    //ArrayList<User> doctorsList=new ArrayList<>();
+    //ArrayList<User> docs = new ArrayList<User>();
+    //ArrayAdapter docsAdapter;
+    /* 29 may code update starts*/
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -85,6 +101,30 @@ public class SignupActivity extends AppCompatActivity {
                                 FirebaseDatabase.getInstance().getReference().child("Score").child(uid).setValue(score);
                                 String refreshedToken = FirebaseInstanceId.getInstance().getToken();
                                 savePushToken(refreshedToken, uid);
+
+                                /*changes for 29 may starts*/
+                                mDocRef = FirebaseFirestore.getInstance().document("Scores/" + uid);
+                                HashMap<String, String> userDetails = new HashMap<>();
+                                userDetails.put("won", "0");
+                                userDetails.put("lost", "0");
+                                userDetails.put("ranking", "0");
+                                userDetails.put("username", username);
+                                mDocRef.set(userDetails).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        Toast.makeText(SignupActivity.this, "successfully added in Firestore!",
+                                                Toast.LENGTH_SHORT).show();
+                                    }
+                                }).addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        Toast.makeText(SignupActivity.this, "Failure to add in Firestore!",
+                                                Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                                /*changes for 29 may ends*/
+
+
 
                                 Toast.makeText(getApplicationContext(), "Sign up is successful!", Toast.LENGTH_SHORT).show();
                                 //Intent intent = new Intent(getApplicationContext(), userHomeActivity.class);
