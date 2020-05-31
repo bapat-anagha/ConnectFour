@@ -12,6 +12,9 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.view.animation.BounceInterpolator;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -66,6 +69,8 @@ public class GameActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //full screen view added 30may
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_game);
         mAuth = FirebaseAuth.getInstance();
         fstore=FirebaseFirestore.getInstance();
@@ -78,12 +83,18 @@ public class GameActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
+                //animation to button added 30 may
+                Animation bounce_anim= AnimationUtils.loadAnimation(GameActivity.this,R.anim.bounce_anim);
+                btnUserProfile.startAnimation(bounce_anim);
                 startActivity(new Intent(GameActivity.this, userHomeActivity.class));
             }
         });
         btnExit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //animation to button added 30 may
+                Animation bounce_anim= AnimationUtils.loadAnimation(GameActivity.this,R.anim.bounce_anim);
+                btnExit.startAnimation(bounce_anim);
                 startActivity(new Intent(GameActivity.this, MainActivity.class));
             }
         });
@@ -353,7 +364,22 @@ public class GameActivity extends AppCompatActivity {
     {
         String uid = mAuth.getCurrentUser().getUid();
         DocumentReference documentReference = fstore.collection("Scores").document(uid);
-        documentReference.addSnapshotListener(GameActivity.this, new EventListener<DocumentSnapshot>() {
+        documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        lost=Integer.parseInt(document.getString("lost"));
+                        String rank=document.getString("ranking");
+                        String username=document.getString("username");
+                        won=Integer.parseInt(document.getString("won"));
+                    }
+                }
+            }
+
+        });
+       /* documentReference.addSnapshotListener(GameActivity.this, new EventListener<DocumentSnapshot>() {
             @Override
             public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
                 lost=Integer.parseInt(documentSnapshot.getString("lost"));
@@ -361,7 +387,37 @@ public class GameActivity extends AppCompatActivity {
                 String username=documentSnapshot.getString("username");
                 won=Integer.parseInt(documentSnapshot.getString("won"));
             }
-        });
+        });*/
+
+       /*documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+           @Override
+           public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+               if(task.isSuccessful())
+               {
+                    DocumentSnapshot documentSnapshot=task.getResult();
+                   lost=Integer.parseInt(documentSnapshot.getString("lost"));
+                   String rank=documentSnapshot.getString("ranking");
+                   String username=documentSnapshot.getString("username");
+                   won=Integer.parseInt(documentSnapshot.getString("won"));
+               }
+               else
+               {
+                   Toast.makeText(GameActivity.this,"problem in fetching db data",Toast.LENGTH_SHORT).show();
+
+               }
+           }
+       });*/
+
+       /* UserScoreDBFetch dbFetch=new UserScoreDBFetch(uid);
+        Score score1=new Score();
+        score1=dbFetch.fetchDetails();
+
+        lost=Integer.parseInt(score1.getLost());
+        String rank=score1.getRanking();
+        String username=score1.getUsername();
+        won=Integer.parseInt(score1.getWon());*/
+
+        Toast.makeText(GameActivity.this,"lost till now "+lost,Toast.LENGTH_SHORT).show();
         if (status.equals("lost"))
         {
             int lost1=lost+1;

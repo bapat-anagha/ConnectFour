@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -49,7 +51,7 @@ int count_rank=0;
     @Override
     public void onBackPressed() {
         //super.onBackPressed();
-        FirebaseAuth.getInstance().signOut();
+        //FirebaseAuth.getInstance().signOut();
         finish();
         Intent intent = new Intent(userHomeActivity.this, MainActivity.class);
         startActivity(intent);
@@ -74,6 +76,8 @@ int count_rank=0;
         btn_logout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Animation bounce_anim= AnimationUtils.loadAnimation(userHomeActivity.this,R.anim.bounce_anim);
+                btn_logout.startAnimation(bounce_anim);
                 FirebaseAuth.getInstance().signOut();
                 finishAffinity();
                 Intent intent = new Intent(userHomeActivity.this, loginActivity.class);
@@ -88,6 +92,8 @@ int count_rank=0;
             public void onClick(View v) {
                 //Toast.makeText(userHomeActivity.this," Button play",Toast.LENGTH_SHORT).show();
                 //updateScores();
+                Animation bounce_anim= AnimationUtils.loadAnimation(userHomeActivity.this,R.anim.bounce_anim);
+                btn_play.startAnimation(bounce_anim);
                 startActivity(new Intent(userHomeActivity.this, MainActivity.class));
             }
         });
