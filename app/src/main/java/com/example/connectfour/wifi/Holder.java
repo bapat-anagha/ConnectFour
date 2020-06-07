@@ -65,12 +65,11 @@ public class Holder extends RecyclerView.ViewHolder {
                             client.newCall(request).enqueue(new Callback() {
                                 @Override
                                 public void onFailure(Call call, IOException e) {
-                                    Log.d("errorrrr--->","");
+
                                 }
 
                                 @Override
                                 public void onResponse(Call call, Response response) throws IOException {
-                                    Log.d("success--->","");
                                     response.body().close();
                                 }
                             });

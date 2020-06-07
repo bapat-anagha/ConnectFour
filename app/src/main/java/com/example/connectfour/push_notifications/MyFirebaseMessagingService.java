@@ -40,7 +40,6 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         } else if (type.equals("accept")) {
             Intent In = new Intent(getBaseContext(), GameActivity.class);
             In.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-Log.e("here---->","why it isn't going to game page");
             startActivity(In
                     .putExtra("type", "wifi")
                     .putExtra("me", Integer.toString(PLAYER))
